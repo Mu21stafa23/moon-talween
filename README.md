@@ -2,6 +2,8 @@
 
 Coloring pages for children, ready to print, in Arabic and English. Pick drawings, say how you want them printed, and get a file made for your paper: one sheet that fills the page, two drawings to a sheet, or a whole coloring book with the child's name on the cover.
 
+**Live site:** https://moon-talween.vercel.app (Arabic), https://moon-talween.vercel.app/en (English)
+
 Everything runs in the browser. There is no server, and pictures you add never leave your device.
 
 ![The home page: the headline and the first drawings](./docs/home.jpg)
