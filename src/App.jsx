@@ -1,7 +1,9 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout.jsx'
 import { StoreProvider } from './lib/store.jsx'
+import Activities from './pages/Activities.jsx'
 import Book from './pages/Book.jsx'
+import Crafts from './pages/Crafts.jsx'
 import Home from './pages/Home.jsx'
 import How from './pages/How.jsx'
 import NotFound from './pages/NotFound.jsx'
@@ -12,6 +14,8 @@ const pages = () => (
   <>
     <Route index element={<Home />} />
     <Route path="print/:ref" element={<PrintOne />} />
+    <Route path="activities" element={<Activities />} />
+    <Route path="crafts" element={<Crafts />} />
     <Route path="book" element={<Book />} />
     <Route path="how" element={<How />} />
     <Route path="*" element={<NotFound />} />

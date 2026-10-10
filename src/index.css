@@ -81,7 +81,7 @@
 .art * {
   fill: #fff;
   stroke: #211c17;
-  stroke-width: var(--line, 5);
+  stroke-width: var(--line, 3.6);
   stroke-linejoin: round;
   stroke-linecap: round;
 }
@@ -94,11 +94,51 @@
   fill: #211c17;
 }
 
+.art .c {
+  fill: none;
+  stroke: #777;
+  stroke-width: 0.8;
+  stroke-dasharray: 4 3;
+}
+
+.art .g {
+  fill: none;
+  stroke: #999;
+  stroke-width: 0.6;
+}
+
+/* Letters to color: the outline first at double width, then the fill over it, which gives a
+   clean outline outside the letter. */
 .art text {
   font-family: 'Baloo Bhaijaan 2', sans-serif;
   font-weight: 800;
   text-anchor: middle;
-  /* Outline first at double width, then the fill over it: a clean outline outside the letter. */
   paint-order: stroke fill;
-  stroke-width: calc(var(--line, 5) * 2);
+  stroke-width: calc(var(--line, 3.6) * 2);
+}
+
+.art text.n {
+  stroke-width: calc(var(--line, 3.6) * 1.2);
+}
+
+/* Plain writing: labels, numbers, instructions. */
+.art text.s,
+.art text.m {
+  fill: #211c17;
+  stroke: none;
+  font-weight: 700;
+}
+
+.art text.m {
+  fill: #555;
+  font-weight: 600;
+}
+
+/* A dotted outline to write over. */
+.art text.t {
+  fill: none;
+  stroke: #555;
+  stroke-width: 1;
+  stroke-dasharray: 2 2.4;
+  paint-order: normal;
 }

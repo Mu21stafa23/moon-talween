@@ -59,6 +59,15 @@ export default function How() {
             ))}
           </ol>
         </div>
+        <div className="lg:col-span-2 rounded-3xl border-[3px] border-ink bg-white p-6">
+          <h2 className="text-3xl">{t('A book from a printer that prints one side only', 'كتاب بطابعة تطبع وجهاً واحداً')}</h2>
+          <p className="mt-2 max-w-3xl">
+            {t(
+              'When setting up a book, choose “One side only”. Each sheet then carries two pages side by side. Fold every sheet in half on its own with the drawings outside, stack the folded sheets in order, and staple the open edges. No sheet goes back into the printer. It takes twice the paper, and felt pens cannot soak through to the next drawing.',
+              'عند تجهيز الكتاب اختر «وجه واحد فقط». تحمل كل ورقة عندها صفحتين متجاورتين. اطوِ كل ورقة لوحدها من المنتصف والرسم إلى الخارج، ورتّب الأوراق المطوية بالتسلسل، ثم دبّس الأطراف المفتوحة. لا تعود أي ورقة إلى الطابعة. يحتاج ضعف الورق، ولا ينفذ الفلوماستر إلى الرسمة التالية.',
+            )}
+          </p>
+        </div>
         <div>
           <h2 className="text-3xl">{t('Which paper for which colors', 'أي ورق لأي ألوان')}</h2>
           <dl className="mt-4 divide-y-2 divide-dashed divide-ink/30 rounded-3xl border-[3px] border-ink bg-white px-5">

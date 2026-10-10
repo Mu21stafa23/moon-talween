@@ -18,6 +18,8 @@ export default function Header() {
 
   const links = [
     { to: to('/'), label: t('Drawings', 'الرسومات'), end: true },
+    { to: to('/activities'), label: t('Activities', 'أنشطة') },
+    { to: to('/crafts'), label: t('Crafts', 'أشغال يدوية') },
     { to: to('/book'), label: book.length > 0 ? t(`My book (${book.length})`, `كتابي (${book.length})`) : t('My book', 'كتابي') },
     { to: to('/how'), label: t('How to print', 'كيف أطبع؟') },
   ]
@@ -35,7 +37,7 @@ export default function Header() {
           <Mark />
           {t('Moon Talween', 'مون تلوين')}
         </Link>
-        <nav aria-label={t('Main', 'القائمة الرئيسية')} className="hidden items-center gap-1 md:flex">
+        <nav aria-label={t('Main', 'القائمة الرئيسية')} className="hidden items-center gap-0.5 lg:flex">
           {links.map((link) => (
             <NavLink key={link.to} to={link.to} end={link.end} className={linkClass}>
               {link.label}
@@ -43,13 +45,13 @@ export default function Header() {
           ))}
           {language}
         </nav>
-        <button type="button" className="grid h-12 w-12 place-items-center rounded-xl border-[3px] border-ink bg-white md:hidden" aria-expanded={open} aria-controls="menu" onClick={() => setOpen(!open)}>
+        <button type="button" className="grid h-12 w-12 place-items-center rounded-xl border-[3px] border-ink bg-white lg:hidden" aria-expanded={open} aria-controls="menu" onClick={() => setOpen(!open)}>
           {open ? <Close /> : <Menu />}
           <span className="sr-only">{open ? t('Close menu', 'أغلق القائمة') : t('Open menu', 'افتح القائمة')}</span>
         </button>
       </div>
       {open && (
-        <nav id="menu" aria-label={t('Main', 'القائمة الرئيسية')} className="absolute inset-x-0 top-full border-y-[3px] border-ink bg-paper md:hidden">
+        <nav id="menu" aria-label={t('Main', 'القائمة الرئيسية')} className="absolute inset-x-0 top-full border-y-[3px] border-ink bg-paper lg:hidden">
           <div className="wrap flex flex-col gap-1 py-3">
             {links.map((link) => (
               <NavLink key={link.to} to={link.to} end={link.end} className={(state) => `${linkClass(state)} py-3`}>

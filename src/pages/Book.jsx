@@ -1,9 +1,10 @@
-import { useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import Art from '../components/Art.jsx'
 import Choice from '../components/Choice.jsx'
 import Output from '../components/Output.jsx'
 import Preview from '../components/Preview.jsx'
+import Toggle from '../components/Toggle.jsx'
 import { Close, Down, Up } from '../components/icons.jsx'
 import { useTitle } from '../lib/hooks.js'
 import { useLang, useT, useTo } from '../lib/i18n.jsx'
@@ -30,6 +31,11 @@ const twoIcon = (
 )
 
 const steps = {
+  leaves: [
+    { en: 'Print on one side, at “actual size”. Nothing is printed on the back.', ar: 'اطبع على وجه واحد، مع «الحجم الفعلي». لا شيء يُطبع على الظهر.' },
+    { en: 'Fold each sheet in half on its own, with the drawings on the outside.', ar: 'اطوِ كل ورقة لوحدها من المنتصف، والرسم إلى الخارج.' },
+    { en: 'Stack them in order, folds on one side, and staple the open edges.', ar: 'رتّبها بالتسلسل والطيّات في جهة واحدة، ثم دبّس الأطراف المفتوحة.' },
+  ],
   book: [
     { en: 'Print on both sides and choose “flip on short edge”. Keep “actual size”.', ar: 'اطبع على الوجهين واختر «القلب على الحافة القصيرة»، مع «الحجم الفعلي».' },
     { en: 'Keep the sheets in the order they came out and fold the stack in half.', ar: 'اترك الأوراق بترتيب خروجها واطوِها معاً من المنتصف.' },
@@ -65,11 +71,28 @@ export default function Book() {
   const lang = useLang()
   const t = useT()
   const to = useTo()
-  const { book, options, setOption, resolve, remove, move, clear } = useStore()
+  const { book, options, setOption, resolve, remove, move, clear, load } = useStore()
+  const [params, setParams] = useSearchParams()
+  const [copied, setCopied] = useState('')
   useTitle(t('My book | Moon Talween', 'كتابي | مون تلوين'))
 
-  const items = useMemo(() => book.map(resolve).filter(Boolean), [book, resolve])
-  const thePlan = useMemo(() => plan({ mode: options.mode, items, paper: options.paper, fit: options.fit, tool: options.tool, rtl: lang === 'ar' }), [items, options.mode, options.paper, options.fit, options.tool, lang])
+  // A shared link carries a book: its drawings, and how it was set up. Opening one replaces
+  // the book on this device, then the address is tidied.
+  useEffect(() => {
+    if (!params.has('b')) return
+    const [mode, sides, tool, paper, line] = (params.get('o') ?? '').split('.')
+    const settings = { childName: (params.get('n') ?? '').slice(0, 24) }
+    if (['book', 'sheets', 'two'].includes(mode)) settings.mode = mode
+    if (['both', 'one'].includes(sides)) settings.sides = sides
+    if (tools[tool]) settings.tool = tool
+    if (papers[paper]) settings.paper = paper
+    if (['thick', 'medium', 'thin'].includes(line)) settings.line = line
+    load(params.get('b').split('~'), settings)
+    setParams({}, { replace: true })
+  }, [params, setParams, load])
+
+  const items = useMemo(() => book.flatMap((ref) => (resolve(ref) ? [{ ...resolve(ref), ref }] : [])), [book, resolve])
+  const thePlan = useMemo(() => plan({ mode: options.mode, sides: options.sides, items, paper: options.paper, fit: options.fit, tool: options.tool, nameLine: options.nameLine, rtl: lang === 'ar' }), [items, options.mode, options.sides, options.paper, options.fit, options.tool, options.nameLine, lang])
   const how = useMemo(() => renderOptions(items, options, lang), [items, options, lang])
   // A book is shown page by page, in reading order; the printed sheets carry two pages each.
   const shownPages = useMemo(() => (thePlan.mode === 'book' ? thePlan.order.map((content) => leafPage(options.paper, content)) : thePlan.pages), [thePlan, options.paper])
@@ -77,6 +100,22 @@ export default function Book() {
   if (items.length === 0) return <Empty />
   const paper = papers[options.paper] ?? papers.a4
   const bleeds = tools[options.tool]?.bleeds
+  const oneSided = thePlan.mode === 'book' && thePlan.sides === 'one'
+  const hasPictures = items.some((item) => item.kind === 'picture')
+
+  const share = async () => {
+    const link = new URLSearchParams()
+    link.set('b', items.filter((item) => item.kind !== 'picture').map((item) => item.ref).join('~'))
+    link.set('o', [options.mode, options.sides, options.tool, options.paper, options.line].join('.'))
+    if (options.childName.trim()) link.set('n', options.childName.trim())
+    const url = `${window.location.origin}${to('/book')}?${link}`
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopied('done')
+    } catch {
+      setCopied(url)
+    }
+  }
 
   return (
     <div className="wrap pb-6 pt-2">
@@ -132,6 +171,20 @@ export default function Book() {
             ]}
           />
 
+          {options.mode === 'book' && (
+            <Choice
+              legend={t('Your printer prints on:', 'طابعتك تطبع على:')}
+              name="sides"
+              value={options.sides}
+              onChange={(value) => setOption('sides', value)}
+              columns="grid-cols-2"
+              options={[
+                { id: 'both', label: t('Both sides', 'الوجهين'), note: t('less paper, stapled in the middle', 'ورق أقل، يُدبَّس من المنتصف') },
+                { id: 'one', label: t('One side only', 'وجه واحد فقط'), note: t('works on any printer', 'تعمل على أي طابعة') },
+              ]}
+            />
+          )}
+
           {options.mode === 'sheets' && (
             <Choice
               legend={t('How should each drawing sit on its sheet?', 'كيف تريد الرسمة على الورقة؟')}
@@ -179,6 +232,12 @@ export default function Book() {
             ]}
           />
 
+          {options.mode !== 'book' && (
+            <Toggle id="name-line" checked={options.nameLine} onChange={(value) => setOption('nameLine', value)}>
+              {t('A line for the child’s name above each drawing (for teachers)', 'سطر لاسم الطفل أعلى كل رسمة (للمعلمين)')}
+            </Toggle>
+          )}
+
           {options.mode === 'book' && (
             <div>
               <label htmlFor="child" className="text-xl font-extrabold">
@@ -211,10 +270,12 @@ export default function Book() {
 
           <div className="mt-5 rounded-2xl border-[3px] border-ink bg-white p-4">
             <p className="text-xl font-extrabold" data-summary>
-              {summary(thePlan, items, paper.label, lang)}
+              {summary(thePlan, paper.label, lang)}
             </p>
             <p className="font-semibold text-mute">
-              {thePlan.mode === 'book'
+              {oneSided
+                ? t('Every sheet is printed on one side and folded on its own. No paper goes back into the printer, and felt pens do not soak through to the next drawing.', 'كل ورقة تُطبع على وجه واحد وتُطوى لوحدها. لا يُعاد الورق إلى الطابعة، ولا ينفذ الفلوماستر إلى الرسمة التالية.')
+                : thePlan.mode === 'book'
                 ? bleeds
                   ? t('Each drawing has a blank page behind it, and the pages are arranged to read in order once folded.', 'خلف كل رسمة صفحة فارغة، والصفحات مرتّبة لتصير بالتسلسل الصحيح بعد الطي.')
                   : t('The pages are arranged so they read in order once the sheets are folded.', 'الصفحات مرتّبة لتصير بالتسلسل الصحيح بعد طي الأوراق.')
@@ -227,8 +288,19 @@ export default function Book() {
             </div>
           </div>
 
+          <div className="mt-4 rounded-2xl border-[3px] border-ink bg-white p-4">
+            <button type="button" className="btn-flat" onClick={share}>
+              {t('Copy a link to this book', 'انسخ رابط هذا الكتاب')}
+            </button>
+            <p role="status" className="mt-2 break-all font-semibold text-mute">
+              {copied === 'done' && t('Link copied. Whoever opens it gets the same book.', 'نُسخ الرابط. من يفتحه يحصل على الكتاب نفسه.')}
+              {copied && copied !== 'done' && copied}
+              {!copied && hasPictures && t('Your own pictures are not part of the link.', 'صورك الخاصة لا تدخل في الرابط.')}
+            </p>
+          </div>
+
           <ol className="mt-4 grid gap-3 sm:grid-cols-3">
-            {steps[thePlan.mode].map((step, index) => (
+            {steps[oneSided ? 'leaves' : thePlan.mode].map((step, index) => (
               <li key={step.en} className="rounded-2xl border-2 border-ink bg-white p-3 text-base font-semibold leading-snug">
                 <span className="me-1.5 inline-grid h-7 w-7 place-items-center rounded-full bg-ink text-base font-bold text-white">{index + 1}</span>
                 {step[lang]}

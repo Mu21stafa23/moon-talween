@@ -41,6 +41,42 @@ function roundedRect(path, x, y, w, h, r) {
   path.closePath()
 }
 
+// How each kind of text is drawn. Letters to color have no class.
+function paintText(ctx, node, number) {
+  const kind = node.getAttribute('class')
+  const x = number('x')
+  const y = number('y')
+  const value = node.textContent
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'alphabetic'
+  if (kind === 's' || kind === 'm') {
+    // Plain writing: a label, a number, a line of instructions.
+    ctx.font = `${kind === 's' ? 700 : 600} ${number('font-size')}px ${FONT}`
+    ctx.fillStyle = kind === 's' ? INK : '#555555'
+    ctx.fillText(value, x, y)
+    return
+  }
+  ctx.font = `800 ${number('font-size')}px ${FONT}`
+  if (kind === 't') {
+    // A dotted outline to write over.
+    ctx.save()
+    ctx.strokeStyle = '#555555'
+    ctx.lineWidth = 1
+    ctx.setLineDash([2, 2.4])
+    ctx.strokeText(value, x, y)
+    ctx.restore()
+    return
+  }
+  // The outline is drawn twice as wide and the letter is then filled over it. That leaves a
+  // clean outline outside the letter and hides the places where its own strokes overlap.
+  ctx.save()
+  ctx.lineWidth *= kind === 'n' ? 1.2 : 2
+  ctx.strokeText(value, x, y)
+  ctx.restore()
+  ctx.fillStyle = '#ffffff'
+  ctx.fillText(value, x, y)
+}
+
 function paint(ctx, parent) {
   for (const node of parent.children) {
     const number = (name) => Number(node.getAttribute(name) ?? 0)
@@ -50,19 +86,8 @@ function paint(ctx, parent) {
       applyTransform(ctx, transform)
     }
     if (node.tagName === 'g') paint(ctx, node)
-    else if (node.tagName === 'text') {
-      ctx.font = `800 ${number('font-size')}px ${FONT}`
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'alphabetic'
-      // The outline is drawn twice as wide and the letter is then filled over it. That leaves a
-      // clean outline outside the letter and hides the places where its own strokes overlap.
-      ctx.save()
-      ctx.lineWidth *= 2
-      ctx.strokeText(node.textContent, number('x'), number('y'))
-      ctx.restore()
-      ctx.fillStyle = '#ffffff'
-      ctx.fillText(node.textContent, number('x'), number('y'))
-    } else {
+    else if (node.tagName === 'text') paintText(ctx, node, number)
+    else {
       let path
       if (node.tagName === 'path') path = new Path2D(node.getAttribute('d'))
       else {
@@ -72,21 +97,38 @@ function paint(ctx, parent) {
         else if (node.tagName === 'rect') roundedRect(path, number('x'), number('y'), number('width'), number('height'), number('rx'))
       }
       const kind = node.getAttribute('class')
-      if (kind !== 'o') {
-        ctx.fillStyle = kind === 'd' ? INK : '#ffffff'
-        ctx.fill(path)
+      if (kind === 'c' || kind === 'g') {
+        // A dashed line to cut or fold along, or a faint line to write on.
+        ctx.save()
+        ctx.strokeStyle = kind === 'c' ? '#777777' : '#999999'
+        ctx.lineWidth = kind === 'c' ? 0.8 : 0.6
+        if (kind === 'c') ctx.setLineDash([4, 3])
+        ctx.stroke(path)
+        ctx.restore()
+      } else {
+        if (kind !== 'o') {
+          ctx.fillStyle = kind === 'd' ? INK : '#ffffff'
+          ctx.fill(path)
+        }
+        ctx.stroke(path)
       }
-      ctx.stroke(path)
     }
     if (transform) ctx.restore()
   }
 }
 
-/** Draws one drawing into a square of `size`, with its top left corner at x, y. */
-export function drawArt(ctx, art, x, y, size, line) {
+/** A drawing's markup in one language. Most drawings have no words and are the same in both. */
+export const artOf = (item, lang) => (typeof item.art === 'string' ? item.art : item.art[lang])
+
+/** The box a drawing is made in: 200 by 200 unless it says otherwise. */
+export const boxOf = (item) => item.box ?? [200, 200]
+
+/** Draws one drawing as large as fits in the rectangle, centred, keeping its shape. */
+export function drawArt(ctx, art, rect, line, box = [200, 200]) {
+  const scale = Math.min(rect.w / box[0], rect.h / box[1])
   ctx.save()
-  ctx.translate(x, y)
-  ctx.scale(size / 200, size / 200)
+  ctx.translate(rect.x + (rect.w - box[0] * scale) / 2, rect.y + (rect.h - box[1] * scale) / 2)
+  ctx.scale(scale, scale)
   ctx.lineWidth = line
   ctx.lineJoin = 'round'
   ctx.lineCap = 'round'
@@ -102,7 +144,7 @@ function fitInside(boxW, boxH, w, h) {
   return { w: w * scale, h: h * scale }
 }
 
-function drawItem(ctx, item, box, line, turn) {
+function drawItem(ctx, item, box, line, turn, lang) {
   if (item.kind === 'picture') {
     const { image } = item
     // A wide picture on a tall sheet is turned on its side, so it prints as large as it can.
@@ -117,8 +159,7 @@ function drawItem(ctx, item, box, line, turn) {
     ctx.restore()
     return
   }
-  const side = Math.min(box.w, box.h)
-  drawArt(ctx, item.art, box.x + (box.w - side) / 2, box.y + (box.h - side) / 2, side, line)
+  drawArt(ctx, artOf(item, lang), box, line * (item.weight ?? 1), boxOf(item))
 }
 
 function write(ctx, value, x, y, size, weight = 700, color = INK) {
@@ -129,7 +170,7 @@ function write(ctx, value, x, y, size, weight = 700, color = INK) {
   ctx.fillText(value, x, y)
 }
 
-function drawCover(ctx, box, mm, words, first, line) {
+function drawCover(ctx, box, mm, words, first, line, lang) {
   // A frame, the title, the child's name, and the first drawing as a taste of what is inside.
   ctx.lineWidth = 1.2 * mm
   ctx.strokeStyle = INK
@@ -142,7 +183,7 @@ function drawCover(ctx, box, mm, words, first, line) {
   if (words.name) write(ctx, words.name, middle, box.y + box.h * 0.245, 21 * unit, 800)
   if (first) {
     const side = Math.min(box.w * 0.8, box.h * 0.54)
-    drawItem(ctx, first, { x: middle - side / 2, y: box.y + box.h * 0.37, w: side, h: side }, line, false)
+    drawItem(ctx, first, { x: middle - side / 2, y: box.y + box.h * 0.37, w: side, h: side }, line, false, lang)
   }
 }
 
@@ -156,7 +197,7 @@ function drawBack(ctx, box, words) {
 
 /**
  * @param {object} page     a page from `plan()`
- * @param {object} options  { dpi, line: 'thick'|'medium'|'thin', words: { title, name, back, site }, first, nameOf(item) }
+ * @param {object} options  { dpi, lang, line: 'thick'|'medium'|'thin', words: { title, name, back, site, nameLine }, first, nameOf(item) }
  * @returns {HTMLCanvasElement}
  */
 export function renderPage(page, options) {
@@ -167,16 +208,19 @@ export function renderPage(page, options) {
   const ctx = canvas.getContext('2d')
   ctx.fillStyle = '#ffffff'
   ctx.fillRect(0, 0, canvas.width, canvas.height)
+  // Arabic lines are written from the right, so a colon or a blank to fill in lands on the correct side.
+  ctx.direction = options.lang === 'ar' ? 'rtl' : 'ltr'
   const line = lines[options.line] ?? lines.medium
 
   for (const slot of page.slots) {
     const box = { x: slot.x * mm, y: slot.y * mm, w: slot.w * mm, h: slot.h * mm }
     const { content } = slot
     if (content.type === 'art') {
-      drawItem(ctx, content.item, box, line, slot.turn)
+      drawItem(ctx, content.item, box, line, slot.turn, options.lang)
+      if (slot.header) write(ctx, options.words.nameLine, box.x + box.w / 2, box.y - 6.5 * mm, 5.2 * mm, 600, '#333333')
       if (slot.caption) write(ctx, options.nameOf(content.item), box.x + box.w / 2, box.y + box.h + 8 * mm, 7 * mm, 700)
       if (slot.number) write(ctx, String(slot.number), box.x + box.w / 2, box.y + box.h + 4.5 * mm, 5 * mm, 700, '#555555')
-    } else if (content.type === 'cover') drawCover(ctx, box, mm, options.words, options.first, line)
+    } else if (content.type === 'cover') drawCover(ctx, box, mm, options.words, options.first, line, options.lang)
     else if (content.type === 'back') drawBack(ctx, box, options.words)
   }
 

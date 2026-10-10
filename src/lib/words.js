@@ -22,17 +22,16 @@ export function nameOf(item, lang) {
 }
 
 /** One line saying what will come out of the printer. */
-export function summary(thePlan, items, paperLabel, lang) {
+export function summary(thePlan, paperLabel, lang) {
   const ar = lang === 'ar'
+  const sheets = count.sheets(thePlan.sheets, lang)
   if (thePlan.mode === 'book') {
-    return ar
-      ? `كتاب من ${count.pages(thePlan.bookPages, lang)} على ${count.sheets(thePlan.sheets, lang)} ${paperLabel}`
-      : `A book of ${count.pages(thePlan.bookPages, lang)} on ${count.sheets(thePlan.sheets, lang)} of ${paperLabel}`
+    const pages = count.pages(thePlan.bookPages, lang)
+    return ar ? `كتاب من ${pages} على ${sheets} ${paperLabel}` : `A book of ${pages} on ${sheets} of ${paperLabel}`
   }
-  if (thePlan.mode === 'two') {
-    return ar ? `${count.drawings(items.length, lang)} على ${count.sheets(thePlan.sheets, lang)} ${paperLabel}` : `${count.drawings(items.length, lang)} on ${count.sheets(thePlan.sheets, lang)} of ${paperLabel}`
-  }
-  return ar ? `${count.sheets(thePlan.sheets, lang)} ${paperLabel}، رسمة في كل ورقة` : `${count.sheets(thePlan.sheets, lang)} of ${paperLabel}, one drawing each`
+  const drawn = thePlan.pages.reduce((sum, page) => sum + page.slots.filter((slot) => slot.content.type === 'art').length, 0)
+  if (thePlan.mode === 'two') return ar ? `${count.drawings(drawn, lang)} على ${sheets} ${paperLabel}` : `${count.drawings(drawn, lang)} on ${sheets} of ${paperLabel}`
+  return ar ? `${sheets} ${paperLabel}، رسمة في كل ورقة` : `${sheets} of ${paperLabel}, one drawing each`
 }
 
 /** The words written on the pages themselves, and what the renderer needs to know. */
@@ -44,15 +43,17 @@ export function renderOptions(items, options, lang) {
     name,
     back: name ? (ar ? 'هذا كتاب' : 'This book belongs to') : '',
     site: ar ? 'مون تلوين' : 'Moon Talween',
+    nameLine: ar ? 'الاسم: ______________________' : 'Name: ______________________',
   }
   const names = items.map((item) => nameOf(item, lang))
   return {
+    lang,
     line: options.line,
     words,
     first: items[0],
     nameOf: (item) => nameOf(item, lang),
     // Every letter that will be written, so the right part of the typeface is loaded first.
-    sample: [words.title, words.name, words.back, words.site, ...names, ...items.map((item) => item.text ?? ''), '0123456789'].join(' '),
+    sample: [words.title, words.name, words.back, words.site, words.nameLine, ...names, ...items.map((item) => item.text ?? ''), ...items.map((item) => (item.art && typeof item.art !== 'string' ? item.art[lang].replace(/<[^>]*>/g, ' ') : '')), '0123456789'].join(' ').slice(0, 4000),
   }
 }
 
