@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-padding-top: 1.5rem;
+  }
+
+  body {
+    @apply bg-paper font-sans text-lg text-ink antialiased;
+    line-height: 1.6;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-extrabold;
+    line-height: 1.3;
+  }
+
+  :focus-visible {
+    @apply outline outline-[3px] outline-offset-2 outline-crayon-blue;
+  }
+}
+
+@layer components {
+  .wrap {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-7;
+  }
+
+  /* Everything you can press looks like a sticker: a thick outline and a hard shadow. */
+  .btn {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-2xl border-[3px] border-ink bg-white px-5 py-1.5 text-lg font-bold text-ink shadow-hard transition-transform active:translate-x-0.5 active:translate-y-0.5 active:shadow-none disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-go {
+    @apply btn bg-crayon-red text-white;
+  }
+
+  .btn-sun {
+    @apply btn bg-crayon-yellow;
+  }
+
+  .btn-flat {
+    @apply btn shadow-none;
+  }
+
+  .chip {
+    @apply inline-flex min-h-11 cursor-pointer items-center whitespace-nowrap rounded-full border-[3px] border-ink bg-white px-4 py-0.5 font-bold;
+  }
+
+  .chip-on {
+    @apply bg-ink text-white;
+  }
+
+  .card {
+    @apply rounded-3xl border-[3px] border-ink bg-white;
+  }
+
+  .opt {
+    @apply flex min-h-14 cursor-pointer flex-col items-center justify-center rounded-2xl border-[3px] border-ink bg-white px-2 py-2 text-center text-[1.05rem] font-bold leading-snug;
+  }
+
+  .opt-on {
+    @apply bg-crayon-yellow shadow-hard;
+  }
+
+  .link {
+    @apply font-bold underline decoration-[3px] underline-offset-4 hover:text-crayon-deep;
+  }
+}
+
+/* A drawing: white shapes with a black outline. "o" is an open line, "d" a solid dot. */
+.art {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.art * {
+  fill: #fff;
+  stroke: #211c17;
+  stroke-width: var(--line, 5);
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.art .o {
+  fill: none;
+}
+
+.art .d {
+  fill: #211c17;
+}
+
+.art text {
+  font-family: 'Baloo Bhaijaan 2', sans-serif;
+  font-weight: 800;
+  text-anchor: middle;
+  /* Outline first at double width, then the fill over it: a clean outline outside the letter. */
+  paint-order: stroke fill;
+  stroke-width: calc(var(--line, 5) * 2);
+}
