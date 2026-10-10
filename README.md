@@ -12,7 +12,7 @@ Everything runs in the browser. There is no server, and pictures you add never l
 
 ### Drawings
 
-- **58 original drawings** in nine groups: characters, animals, the sea, nature and home, vehicles, space, from our country (a camel, a palm, a dallah, a falcon, a mud house, a dhow), occasions (a lantern, a crescent, a mosque, a cake and more) and things for older children (a controller, a sneaker, headphones, a guitar and more).
+- **52 original drawings** in eight groups: characters, animals, the sea, nature and home, vehicles, space, occasions (a lantern, a crescent, a mosque, a cake and more) and things for older children (a controller, a sneaker, headphones, a guitar and more).
 - **Mandalas and patterns** for older children, up to 15: eight mandalas in three levels of detail, and star, honeycomb and tile patterns.
 - **A page for every letter and number:** the 28 Arabic letters, A to Z, and 0 to 9, each as one large outline.
 - **Filter by age:** three ranges, the oldest 9 to 15.
@@ -50,7 +50,7 @@ Whole sheets to color and then cut or fold: a certificate and a door sign with t
 - **Two a sheet,** with a dashed line to cut along.
 - **A coloring book.** Sheets folded in half. The site puts every page where it has to go, so the folded stack reads in order, opening from the right in Arabic and from the left in English.
 - **A printer that prints one side only** still gets a book: each sheet carries two pages on one side, is folded on its own with the print outside, and the sheets are stapled at their open edges.
-- **Ready-made books:** eight sets (animals, heroes, from our country, Eid and Ramadan, and more), and "surprise me" for a random one.
+- **Ready-made books:** seven sets (animals, heroes, Eid and Ramadan, sea and space, and more), and "surprise me" for a random one.
 - **Share a book by link.** The link carries the chosen drawings and settings, nothing else. Pictures you added are not in it.
 - **What will the child color with?** Pencils and crayons print on both sides. Felt pens and watercolors soak through, so in a two-sided book each drawing gets a leaf of its own, and the site says which paper to use.
 - **Paper:** A4, Letter or A5. **Lines:** thick for little ones, medium or thin.
