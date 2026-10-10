@@ -110,7 +110,7 @@ export default function Home() {
             {t('Surprise me', 'فاجئني')}
           </button>
         </div>
-        <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
+        <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
           {packs.map((pack) => (
             <li key={pack.id} className="min-w-0">
               <button type="button" className="card flex h-full w-full flex-col items-center gap-1 p-2.5 text-center transition-transform hover:-translate-y-0.5" onClick={() => make(pack.refs)}>

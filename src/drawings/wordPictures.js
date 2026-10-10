@@ -1,4 +1,4 @@
-// Things from the Arabian Peninsula.
+// Drawings that only illustrate a word on a letter page ("ج جمل"). They are not shown in the gallery.
 export default [
   {
     id: 'camel',
@@ -17,23 +17,5 @@ export default [
     name: { ar: 'دلّة', en: 'Coffee pot' },
     age: [5, 9],
     art: `<path d="M148 158h32l-5 24h-22z"/><path class="o" d="M150 168h28"/><path d="M118 98C152 94 160 132 134 152L127 143C144 130 140 110 118 110z"/><path d="M88 98C62 84 46 86 30 72C42 104 62 112 82 114z"/><path d="M76 176C58 150 68 118 86 100L84 84H116L114 100C132 118 142 150 124 176z"/><path class="o" d="M72 132h56M70 148h60"/><path d="M84 84C84 62 116 62 116 84z"/><path d="M96 66l4-16l4 16z"/><circle cx="100" cy="46" r="5"/><rect x="70" y="176" width="60" height="9" rx="3"/>`,
-  },
-  {
-    id: 'falcon',
-    name: { ar: 'صقر', en: 'Falcon' },
-    age: [5, 9],
-    art: `<rect x="38" y="174" width="124" height="11" rx="5"/><path class="o" d="M86 174v-10M94 174v-10M106 174v-10M114 174v-10"/><path d="M100 40C134 40 144 82 140 120C136 152 120 168 100 172C80 168 64 152 60 120C56 82 66 40 100 40z"/><path d="M62 98C46 130 54 160 76 172C68 150 68 124 72 102z"/><path d="M138 98C154 130 146 160 124 172C132 150 132 124 128 102z"/><circle cx="84" cy="70" r="9"/><circle cx="116" cy="70" r="9"/><circle cx="85" cy="71" r="3.5" class="d"/><circle cx="115" cy="71" r="3.5" class="d"/><path d="M91 82h18q-2 14-9 20q-7-6-9-20z"/><path class="o" d="M82 120q6 6 12 0t12 0t12 0M86 136q7 6 14 0t14 0M92 152q4 5 8 0t8 0"/>`,
-  },
-  {
-    id: 'mudhouse',
-    name: { ar: 'بيت طيني', en: 'Mud-brick house' },
-    age: [5, 9],
-    art: `<path class="o" d="M20 178h160"/><path d="M40 178V72h4l6-10l6 10h8l6-10l6 10h8l6-10l6 10h8l6-10l6 10h8l6-10l6 10h8l6-10l6 10h4V178z"/><path d="M86 178v-44a14 14 0 0 1 28 0v44z"/><path class="o" d="M100 120v58M86 150h28"/><path d="M54 116l8-12l8 12z"/><path d="M130 116l8-12l8 12z"/><path d="M54 92l8-12l8 12z"/><path d="M130 92l8-12l8 12z"/><path class="o" d="M40 128h30M130 128h30"/>`,
-  },
-  {
-    id: 'dhow',
-    name: { ar: 'قارب صيد', en: 'Dhow' },
-    age: [5, 9],
-    art: `<path class="o" d="M94 132V26"/><path d="M94 26l20 7l-20 7z"/><path d="M96 46L170 120L58 116z"/><path class="o" d="M82 96L150 118"/><path d="M18 124C40 170 150 174 186 116L152 132H50z"/><path class="o" d="M40 146h112"/><path class="o" d="M8 184q12-10 24 0t24 0t24 0t24 0t24 0t24 0t24 0t16-4"/>`,
   },
 ]

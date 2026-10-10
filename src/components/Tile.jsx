@@ -6,7 +6,7 @@ import Art from './Art.jsx'
 import { Check } from './icons.jsx'
 
 // A chosen tile is tinted, as if someone had started coloring it.
-const tints = { sea: '#e3f1ff', english: '#e3f1ff', maze: '#e3f1ff', nature: '#e6f6ea', numbers: '#e6f6ea', local: '#e6f6ea', dots: '#e6f6ea', vehicles: '#ffe6e0', occasions: '#ffe6e0', space: '#efe7ff', patterns: '#efe7ff', objects: '#efe7ff', picture: '#f3ecdc' }
+const tints = { sea: '#e3f1ff', english: '#e3f1ff', maze: '#e3f1ff', nature: '#e6f6ea', numbers: '#e6f6ea', dots: '#e6f6ea', vehicles: '#ffe6e0', occasions: '#ffe6e0', space: '#efe7ff', patterns: '#efe7ff', objects: '#efe7ff', picture: '#f3ecdc' }
 
 export const ageLabel = (age, lang) => (lang === 'ar' ? `${age[0]} إلى ${age[1]} سنة` : `ages ${age[0]} to ${age[1]}`)
 

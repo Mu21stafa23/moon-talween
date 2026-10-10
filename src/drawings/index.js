@@ -1,5 +1,5 @@
 import { featuredPatterns, makeItem } from '../makers/index.js'
-import { handDrawing, handGroups } from './base.js'
+import { handGroups } from './base.js'
 import { arabic, english, numbers } from './letters.js'
 
 // Everything the gallery shows: the hand-made drawings, a set of chosen mandalas and
@@ -14,11 +14,10 @@ export const groups = [
 
 export const drawings = groups.flatMap((group) => group.items.map((item) => ({ ...item, group: group.id })))
 
-const letterIndex = new Map([...arabic, ...english, ...numbers].map((item) => [item.id, item]))
+// Only what the gallery shows can be opened by its id. Drawings kept just to illustrate a word are left out.
+const stored = new Map(drawings.filter((item) => item.group !== 'patterns').map((item) => [item.id, item]))
 
 /** A drawing or made page by its reference. */
 export function drawingById(id) {
-  const stored = handDrawing(id) ?? letterIndex.get(id)
-  if (stored) return { ...stored, group: stored.group ?? groups.find((group) => group.items.includes(stored))?.id }
-  return makeItem(id)
+  return stored.get(id) ?? makeItem(id)
 }
